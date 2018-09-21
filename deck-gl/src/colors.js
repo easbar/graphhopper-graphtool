@@ -1,0 +1,10 @@
+export const SELECT_AREA_BOX = [0, 0, 150, 255];
+export const SELECT_AREA_BOX_FILL = [0, 0, 150, 50];
+export const EDGE = [0, 132, 235, 255];
+export const EDGE_HIGHLIGHT = [0, 255, 0, 255];
+export const EDGE_LABEL = [0, 132, 235, 255];
+export const NODE = [255, 0, 0, 255];
+export const NODE_HIGHLIGHT = [0, 255, 0, 255];
+export const NODE_LABEL = [255, 0, 0, 255];
+export const MAP_BBOX = [130, 130, 130];
+export const INVISIBLE = [0, 0, 0, 0];

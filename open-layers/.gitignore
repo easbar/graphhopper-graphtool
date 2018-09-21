@@ -1,0 +1,13 @@
+// webstorm
+*.iml
+.idea
+
+// npm
+// package-lock blows up repository size
+package-lock.json
+node_modules
+
+// dist
+dist
+!dist/index.html
+!dist/styles.css
