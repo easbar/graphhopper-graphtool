@@ -13,6 +13,11 @@ git checkout graphtool
 Then in a separate location checkout this repository
 ```bash
 git clone git://github.com/ammagamma/graphhopper-graphtool.git
+```
+You need to create an account at `https://www.maptiler.com/cloud/` and enter 
+your token in `src/token.js`. Then run:
+
+```bash
 cd deck.gl
 npm install
 npm run watch
