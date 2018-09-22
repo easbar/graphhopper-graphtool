@@ -8,6 +8,5 @@ package-lock.json
 node_modules
 
 // dist
-dist
-!dist/index.html
-!dist/styles.css
+dist/main.js
+dist/main.js.map

@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Graphhopper Graphtool</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css' rel='stylesheet'/>
+</head>
+<body>
+<div id="sidenav" class="sidenav">
+    <button id="select-area-button" class="button">Select Area</button>
+    <p>Current pointer position (lng, lat):<br><span id="mouse-position"></span></p>
+    <p>Maximum CH node level:<span id="node-level-value">0</span></p>
+    <div class="slide-container">
+        <input id="node-level-slider" type="range" min="1" max="1000000" value="50" class="slider">
+    </div>
+</div>
+<div id="map-container">
+    <!-- used to display the map -->
+    <div id="map"></div>
+    <!-- deck.gl overlay canvas used to draw features on the map -->
+    <canvas id="deck-canvas"></canvas>
+</div>
+<!-- tooltip sometimes shown on the map -->
+<div id="tooltip"></div>
+<script src="main.js"></script>
+</body>
+</html>
