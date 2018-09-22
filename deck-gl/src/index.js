@@ -3,10 +3,10 @@ import {Map} from './map';
 import {loadBoundingBox, loadGraph} from './remote';
 import {GraphLayer} from './graphLayer';
 import {BoundingBoxLayer} from './boundingBoxLayer';
-import {EventManager} from 'mjolnir.js';
 import {Menu} from './menu';
 import {hideTooltip, showTooltip} from './tooltip';
 import {SelectBoxAction} from './selectBoxAction';
+import {EventHandler} from './eventHandler';
 
 const deckCanvas = 'deck-canvas';
 const mapContainer = 'map-container';
@@ -18,10 +18,9 @@ const deck = new Deck(deckCanvas, map);
 const selectBoxAction = new SelectBoxAction(deck);
 const boundingBoxLayer = new BoundingBoxLayer(deck);
 const graphLayer = new GraphLayer(deck);
+const eventHandler = new EventHandler(mapContainer);
 
-const eventManager = new EventManager(document.getElementById(mapContainer));
-
-eventManager.on('mousemove', e => {
+eventHandler.setMouseMoveAction(e => {
     const pos = deck.screenToLngLat(e.center.x, e.center.y);
     menu.setMousePosition(pos);
 });

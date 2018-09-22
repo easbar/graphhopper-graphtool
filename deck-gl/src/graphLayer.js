@@ -129,8 +129,8 @@ export class GraphLayer {
 }
 
 /**
- * Returns the angle (in degrees) between a horizontal line through a point P (lng1, lat1) and the line connecting
- * P with a second point Q (lng2, lat2) as it appears in a 2D plane.
+ * Returns the angle (in degrees) between a horizontal line through a point P (lng1, lat1), and a line connecting
+ * P with a second point Q (lng2, lat2) in a 2D plane.
  */
 function getAngleBetweenPoints(lng1, lat1, lng2, lat2) {
     lng1 = toRadians(lng1);
@@ -138,7 +138,7 @@ function getAngleBetweenPoints(lng1, lat1, lng2, lat2) {
     lng2 = toRadians(lng2);
     lat2 = toRadians(lat2);
 
-    // calculate Haversine distance between P/Q and (lng2, lat1)
+    // calculate Haversine distance between P(Q) and (lng2, lat1)
     const x = 2 * Math.asin(Math.cos(lat1) * Math.sin((lng2 - lng1) / 2));
     const y = lat2 - lat1;
 
