@@ -1,7 +1,5 @@
 import mapboxgl from 'mapbox-gl';
-import {token} from '../token';
-
-const tileUrl = 'https://free.tilehosting.com/styles/basic/style.json?key=' + token;
+import {tilesUrl} from './config';
 
 /**
  * Represents the map that is displayed in the main view and deals with tiles etc., should be independent from
@@ -38,7 +36,7 @@ export class Map {
             longitude: 0,
             latitude: 0,
             zoom: 1,
-            style: tileUrl,
+            style: tilesUrl,
             // map is not interactive, all user interaction will be done via deck.gl
             interactive: false,
         });

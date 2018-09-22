@@ -1,7 +1,7 @@
-const host = 'http://localhost:8989/';
+import {ghUrl} from './config';
 
 export function loadGraph(box) {
-    const url = host + 'graph' +
+    const url = ghUrl + 'graph' +
         '?northEastLat=' + box.northEast.lat + '&northEastLng=' + box.northEast.lng +
         '&southWestLat=' + box.southWest.lat + '&southWestLng=' + box.southWest.lng;
     return $.ajax({
@@ -14,7 +14,7 @@ export function loadGraph(box) {
 }
 
 export function loadBoundingBox() {
-    const url = host + 'info';
+    const url = ghUrl + 'info';
     return $.ajax({
         url: url,
         timeout: 60 * 1000,

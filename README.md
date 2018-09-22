@@ -14,8 +14,10 @@ Then in a separate location checkout this repository
 ```bash
 git clone git://github.com/ammagamma/graphhopper-graphtool.git
 ```
-You need to create an account at `https://www.maptiler.com/cloud/` and enter 
-your token in `src/token.js`. Then run:
+You need to create an account at `https://www.maptiler.com/cloud/`,
+start a local openmaptiles server (`https://openmaptiles.org/docs/website/mapbox-gl-js/`) or similar and configure
+the map tiles and graphhopper urls in `src/config.js`.
+Then run: 
 
 ```bash
 cd deck.gl
@@ -25,7 +27,9 @@ npm run watch
 
 This should start webpack-dev-server (default is http://localhost:8080).
 When you make changes to the code the server should refresh automatically without
-reloading the page. So far this is only tested with a recent version of Chrome.
+reloading the page. 
+
+So far this app is only tested with Chrome 69.
 
 
 
