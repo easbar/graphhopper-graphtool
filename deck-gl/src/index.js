@@ -34,6 +34,7 @@ menu.setSelectAreaButtonAction(() => {
     selectBoxAction.start(mapContainer,
         coords => {
             queryAndDrawGraph(coords);
+            logBBoxForOsmosis(coords);
             selectBoxAction.stop();
         },
         () => {
@@ -96,4 +97,9 @@ function getMinMaxNodeLevels(edges) {
     return {minLevel, maxLevel};
 }
 
+function logBBoxForOsmosis(box) {
+    console.log(`osmosis --read-pbf file=-` +
+        ` --bounding-box left=${box.southWest.lng} bottom=${box.southWest.lat} right=${box.northEast.lng} top=${box.northEast.lat}` +
+        ` --write-pbf file=-`);
+}
 
