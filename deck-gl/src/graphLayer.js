@@ -29,10 +29,10 @@ export class GraphLayer {
             layerId: 'graph-layer-edges',
             createLayer: viewState => {
                 return new LineLayer({
-                    data: graph.edges,
+                    data: graph,
                     getStrokeWidth: 5,
-                    getSourcePosition: e => [e.from.lon, e.from.lat],
-                    getTargetPosition: e => [e.to.lon, e.to.lat],
+                    getSourcePosition: e => [e[5], e[4]],
+                    getTargetPosition: e => [e[9], e[8]],
                     getColor: Colors.EDGE,
                     onHover: e => {
                         if (e.object) {
@@ -52,79 +52,79 @@ export class GraphLayer {
             }
         });
 
-        this._deck.registerLayerFactory({
-            layerId: 'graph-layer-edge-labels',
-            createLayer: viewState => {
-                return new TextLayer({
-                    data: graph.edges,
-                    visible: viewState.zoom > 13,
-                    getText: e => e.id + '',
-                    getSize: 20,
-                    getColor: Colors.EDGE_LABEL,
-                    getPosition: e => [(e.from.lon + e.to.lon) / 2, (e.from.lat + e.to.lat) / 2],
-                    getAngle: e => getAngleBetweenPoints(e.from.lon, e.from.lat, e.to.lon, e.to.lat),
-                    getPixelOffset: e => {
-                        const angle = getAngleBetweenPoints(e.from.lon, e.from.lat, e.to.lon, e.to.lat);
-                        const offset = 22;
-                        return [offset * Math.sin(toRadians(angle)), offset * Math.cos(toRadians(angle))];
-                    }
-                })
-            }
-        });
+        // this._deck.registerLayerFactory({
+        //     layerId: 'graph-layer-edge-labels',
+        //     createLayer: viewState => {
+        //         return new TextLayer({
+        //             data: graph.edges,
+        //             visible: viewState.zoom > 13,
+        //             getText: e => e.id + '',
+        //             getSize: 20,
+        //             getColor: Colors.EDGE_LABEL,
+        //             getPosition: e => [(e.from.lon + e.to.lon) / 2, (e.from.lat + e.to.lat) / 2],
+        //             getAngle: e => getAngleBetweenPoints(e.from.lon, e.from.lat, e.to.lon, e.to.lat),
+        //             getPixelOffset: e => {
+        //                 const angle = getAngleBetweenPoints(e.from.lon, e.from.lat, e.to.lon, e.to.lat);
+        //                 const offset = 22;
+        //                 return [offset * Math.sin(toRadians(angle)), offset * Math.cos(toRadians(angle))];
+        //             }
+        //         })
+        //     }
+        // });
+        //
+        // let nodes = {};
+        // for (let e of graph.edges) {
+        //     nodes[e.from.nodeId] = e.from;
+        //     nodes[e.to.nodeId] = e.to;
+        // }
+        // nodes = Object.values(nodes);
+        //
+        // this._deck.registerLayerFactory({
+        //     layerId: 'graph-layer-nodes',
+        //     createLayer: viewState => {
+        //         return new ScatterplotLayer({
+        //             data: nodes,
+        //             radiusMinPixels: 3,
+        //             radiusMaxPixels: 5,
+        //             getRadius: 5,
+        //             getPosition: n => [n.lon, n.lat],
+        //             getColor: n => (n.level < this._maxNodeLevel) ? Colors.NODE : Colors.INVISIBLE,
+        //             updateTriggers: {
+        //                 getRadius: [this._maxNodeLevel],
+        //                 getColor: [this._maxNodeLevel]
+        //             },
+        //             onHover: n => {
+        //                 if (n.object) {
+        //                     this._onNodeHover({
+        //                         x: n.x,
+        //                         y: n.y,
+        //                         node: n.object
+        //                     });
+        //                 } else {
+        //                     this._onNodeHover();
+        //                 }
+        //             },
+        //             autoHighlight: true,
+        //             highlightColor: Colors.NODE_HIGHLIGHT,
+        //             pickable: true
+        //         });
+        //     }
+        // });
 
-        let nodes = {};
-        for (let e of graph.edges) {
-            nodes[e.from.nodeId] = e.from;
-            nodes[e.to.nodeId] = e.to;
-        }
-        nodes = Object.values(nodes);
-
-        this._deck.registerLayerFactory({
-            layerId: 'graph-layer-nodes',
-            createLayer: viewState => {
-                return new ScatterplotLayer({
-                    data: nodes,
-                    radiusMinPixels: 3,
-                    radiusMaxPixels: 5,
-                    getRadius: 5,
-                    getPosition: n => [n.lon, n.lat],
-                    getColor: n => (n.level < this._maxNodeLevel) ? Colors.NODE : Colors.INVISIBLE,
-                    updateTriggers: {
-                        getRadius: [this._maxNodeLevel],
-                        getColor: [this._maxNodeLevel]
-                    },
-                    onHover: n => {
-                        if (n.object) {
-                            this._onNodeHover({
-                                x: n.x,
-                                y: n.y,
-                                node: n.object
-                            });
-                        } else {
-                            this._onNodeHover();
-                        }
-                    },
-                    autoHighlight: true,
-                    highlightColor: Colors.NODE_HIGHLIGHT,
-                    pickable: true
-                });
-            }
-        });
-
-        this._deck.registerLayerFactory({
-            layerId: 'graph-layer-node-labels',
-            createLayer: viewState => {
-                return new TextLayer({
-                    data: nodes,
-                    visible: viewState.zoom > 13,
-                    getText: n => n.nodeId + '',
-                    getSize: 20,
-                    getColor: Colors.NODE_LABEL,
-                    getPosition: n => [n.lon, n.lat],
-                    getPixelOffset: [0, -22],
-                })
-            }
-        })
+        // this._deck.registerLayerFactory({
+        //     layerId: 'graph-layer-node-labels',
+        //     createLayer: viewState => {
+        //         return new TextLayer({
+        //             data: nodes,
+        //             visible: viewState.zoom > 13,
+        //             getText: n => n.nodeId + '',
+        //             getSize: 20,
+        //             getColor: Colors.NODE_LABEL,
+        //             getPosition: n => [n.lon, n.lat],
+        //             getPixelOffset: [0, -22],
+        //         })
+        //     }
+        // })
     }
 }
 
