@@ -36,7 +36,34 @@ export class Map {
             longitude: 0,
             latitude: 0,
             zoom: 1,
-            style: tilesUrl,
+			style: {
+				"version": 8,
+				"sources": {
+					"graphhopper-mvt": {
+						"type": "vector",
+						"tiles": [
+							tilesUrl
+						]
+					}
+				},
+				"layers": [
+					{
+						"id": "gh",
+						"type": "line",
+						"source": "graphhopper-mvt",
+						"source-layer": "roads",
+						"layout": {
+							"line-cap": "round",
+							"line-join": "round"
+						},
+						"paint": {
+							"line-opacity": 0.6,
+							"line-color": "rgb(53, 175, 109)",
+							"line-width": 2
+						}
+					}
+				]
+			},
             // map is not interactive, all user interaction will be done via deck.gl
             interactive: false,
         });

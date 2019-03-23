@@ -1,7 +1,7 @@
 // specifies where map tiles should be served from. for example you can use
 // https://openmaptiles.org/docs/website/mapbox-gl-js/ or
 // https://www.maptiler.com/cloud/
-export const tilesUrl = '';
+export const tilesUrl = 'http://localhost:8989/mvt/{z}/{x}/{y}.mvt';
 
 // specifies where grapphopper server is running
 export const ghUrl = 'http://localhost:8989/';
