@@ -37,8 +37,11 @@ export class Menu {
     setNodeLevelSliderBounds(min, max) {
         minNodeLevelSlider.attr('min', min);
         minNodeLevelSlider.attr('max', max);
+        minNodeLevelSlider.attr('value', min);
         maxNodeLevelSlider.attr('min', min);
         maxNodeLevelSlider.attr('max', max);
+        maxNodeLevelSlider.attr('value', max);
+        this._onNodeLevelSliderChanged(min, max);
     }
 
     _onFindNodeById(event) {

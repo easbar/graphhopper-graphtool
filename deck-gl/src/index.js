@@ -94,6 +94,8 @@ function queryAndDrawGraph(box) {
         .done(json => {
             const bounds = getMinMaxNodeLevels(json.edges);
             menu.setNodeLevelSliderBounds(bounds.minLevel, bounds.maxLevel);
+            graphLayer.setMinimumNodeLevel(bounds.minLevel);
+            graphLayer.setMaximumNodeLevel(bounds.maxLevel);
             graphLayer.setGraph(json);
             deck.redraw();
         })

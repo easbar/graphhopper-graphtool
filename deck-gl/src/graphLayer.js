@@ -5,8 +5,8 @@ export class GraphLayer {
 
     constructor(deck) {
         this._deck = deck;
-        this._minNodeLevel = 99999999;
-        this._maxNodeLevel = 0;
+        this._minNodeLevel = -99999999;
+        this._maxNodeLevel = +99999999;
         this._highlightedNodes = [];
         this._graph = {};
         this._nodes = {};
@@ -90,11 +90,11 @@ export class GraphLayer {
                     getStrokeWidth: 5,
                     getSourcePosition: e => [e.from.lon, e.from.lat],
                     getTargetPosition: e => [e.to.lon, e.to.lat],
-                    getLineColor: e => {
+                    getColor: e => {
                         return (this.levelInRange(this._nodesByIndex[e.from.nodeId].level) || this.levelInRange(this._nodesByIndex[e.to.nodeId].level)) ? Colors.EDGE : Colors.INVISIBLE
                     },
                     updateTriggers: {
-                        getLineColor: [this._maxNodeLevel, this._minNodeLevel]
+                        getColor: [this._maxNodeLevel, this._minNodeLevel]
                     },
                     onHover: e => {
                         if (e.object) {
@@ -122,7 +122,10 @@ export class GraphLayer {
                     visible: viewState.zoom > 13,
                     // getText: e => e.id + '',
                     getSize: 20,
-                    getColor: Colors.EDGE_LABEL,
+                    getColor: n => this.levelInRange(n.level) ? Colors.EDGE_LABEL : Colors.INVISIBLE,
+                    updateTriggers: {
+                        getColor: [this._maxNodeLevel, this._minNodeLevel]
+                    },
                     getPosition: e => [(e.from.lon + e.to.lon) / 2, (e.from.lat + e.to.lat) / 2],
                     getAngle: e => getAngleBetweenPoints(e.from.lon, e.from.lat, e.to.lon, e.to.lat),
                     getPixelOffset: e => {
@@ -141,7 +144,7 @@ export class GraphLayer {
             createLayer: viewState => {
                 return new LineLayer({
                     data: graph.shortcuts,
-                    getStrokeWidth: 2,
+                    getStrokeWidth: 4,
                     getSourcePosition: e => [e.from.lon, e.from.lat],
                     getTargetPosition: e => [e.to.lon, e.to.lat],
                     getColor: e => {
@@ -176,7 +179,10 @@ export class GraphLayer {
                     visible: viewState.zoom > 13,
                     getText: e => e.id + '',
                     getSize: 20,
-                    getColor: Colors.EDGE_LABEL,
+                    getColor: n => this.levelInRange(n.level) ? Colors.EDGE_LABEL : Colors.INVISIBLE,
+                    updateTriggers: {
+                        getColor: [this._maxNodeLevel, this._minNodeLevel]
+                    },
                     getPosition: e => [(e.from.lon + e.to.lon) / 2, (e.from.lat + e.to.lat) / 2],
                     getAngle: e => getAngleBetweenPoints(e.from.lon, e.from.lat, e.to.lon, e.to.lat),
                     getPixelOffset: e => {
@@ -230,7 +236,10 @@ export class GraphLayer {
                     visible: viewState.zoom > 13,
                     getText: n => n.nodeId + '',
                     getSize: 20,
-                    getColor: Colors.NODE_LABEL,
+                    getColor: n => this.levelInRange(n.level) ? Colors.NODE_LABEL : Colors.INVISIBLE,
+                    updateTriggers: {
+                        getColor: [this._maxNodeLevel, this._minNodeLevel]
+                    },
                     getPosition: n => [n.lon, n.lat],
                     getPixelOffset: [0, -22],
                 })

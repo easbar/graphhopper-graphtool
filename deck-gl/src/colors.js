@@ -1,6 +1,6 @@
 export const SELECT_AREA_BOX = [0, 0, 150, 255];
 export const SELECT_AREA_BOX_FILL = [0, 0, 150, 50];
-export const SHORTCUT = [132, 0, 235, 255];
+export const SHORTCUT = [204, 51, 255, 255];
 export const EDGE = [0, 132, 235, 255];
 export const EDGE_HIGHLIGHT = [0, 255, 0, 255];
 export const EDGE_LABEL = [0, 132, 235, 255];
