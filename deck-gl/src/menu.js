@@ -1,5 +1,10 @@
 const selectAreaButton = $('#select-area-button');
+const lookupLocationButton = $('#lookup-location-button');
 const findNodeByIdField = $('#find-node-by-id-field');
+const zoomToNodeInput = $('#zoom-to-node-input');
+const zoomToNodeButton = $('#zoom-to-node-button');
+const zoomToEdgeInput = $('#zoom-to-edge-input');
+const zoomToEdgeButton = $('#zoom-to-edge-button');
 const minNodeLevelSlider = $('#min-node-level-slider');
 const maxNodeLevelSlider = $('#max-node-level-slider');
 const minNodeLevelDisplay = $('#min-node-level-value');
@@ -26,12 +31,30 @@ export class Menu {
         selectAreaButton.click(e => action());
     }
 
-    setNodeLevelSliderChangedAction(action) {
-        this._nodeLevelSliderChangedAction = action;
+    setLookupLocationAction(action) {
+        lookupLocationButton.click(e => action());
     }
 
     setFindNodeByIdEnteredAction(action) {
         this._findNodeByIdEnteredAction = action;
+    }
+
+    setZoomToNodeAction(action) {
+        zoomToNodeButton.click(e => {
+            const nodeId = zoomToNodeInput.val();
+            action(nodeId);
+        })
+    }
+
+    setZoomToEdgeAction(action) {
+        zoomToEdgeButton.click(e => {
+            const edgeId = zoomToEdgeInput.val();
+            action(edgeId);
+        })
+    }
+
+    setNodeLevelSliderChangedAction(action) {
+        this._nodeLevelSliderChangedAction = action;
     }
 
     setNodeLevelSliderBounds(min, max) {

@@ -43,6 +43,46 @@ export class GraphLayer {
         this._onNodeHover = action;
     }
 
+    setLocationLookup(lookup) {
+        console.log(lookup);
+        this._deck.registerLayerFactory({
+            layerId: 'location-lookup-points',
+            createLayer: viewState => {
+                return new ScatterplotLayer({
+                    data: [{point: lookup.queryPoint, type: 'query'}, {point: lookup.snappedPoint, type: 'snapped'}],
+                    radiusMinPixels: 3,
+                    radiusMaxPixels: 5,
+                    getRadius: 5,
+                    getPosition: n => [n.point[0], n.point[1]],
+                    getFillColor: n => n.type === 'query' ? Colors.NODE_LOOKUP_QUERY : Colors.NODE_LOOKUP_SNAPPED,
+                    autoHighlight: false,
+                    highlightColor: Colors.NODE_HIGHLIGHT,
+                    pickable: true
+                });
+            }
+        });
+
+        this._deck.registerLayerFactory({
+                layerId: 'location-lookup-edges',
+                createLayer: viewState => {
+                    return new LineLayer({
+                        data: [
+                            {edge: lookup.closestEdge, type: 'closest'},
+                            ...lookup.virtualEdges.map(e => ({edge: e, type: 'virtual'}))
+                        ],
+                        getStrokeWidth: 5,
+                        getSourcePosition: e => [e.edge.from.lon, e.edge.from.lat],
+                        getTargetPosition: e => [e.edge.to.lon, e.edge.to.lat],
+                        getLineColor: e => e.type === 'closest' ? Colors.NODE_LOOKUP_SNAPPED : Colors.NODE_LOOKUP_QUERY,
+                        autoHighlight: false,
+                        highlightColor: Colors.EDGE_HIGHLIGHT,
+                        pickable: true
+                    });
+                }
+            }
+        )
+    }
+
     setGraph(graph) {
         this._graph = graph;
         this._nodesByIndex = {};
@@ -142,6 +182,7 @@ export class GraphLayer {
         this._deck.registerLayerFactory({
             layerId: 'graph-layer-shortcuts',
             createLayer: viewState => {
+                // todo: maybe use an ArcLayer to show shortcuts ?
                 return new LineLayer({
                     data: graph.shortcuts,
                     getStrokeWidth: 4,
@@ -199,6 +240,7 @@ export class GraphLayer {
         this._deck.registerLayerFactory({
             layerId: 'graph-layer-nodes',
             createLayer: viewState => {
+                // todo: maybe use a 3D Grid Layer to show CH levels ?
                 return new ScatterplotLayer({
                     data: this._nodes,
                     radiusMinPixels: 2,

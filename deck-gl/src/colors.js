@@ -7,5 +7,7 @@ export const EDGE_LABEL = [0, 132, 235, 255];
 export const NODE = [255, 0, 0, 255];
 export const NODE_HIGHLIGHT = [0, 255, 0, 255];
 export const NODE_LABEL = [255, 0, 0, 255];
+export const NODE_LOOKUP_QUERY = [200, 100, 100, 255];
+export const NODE_LOOKUP_SNAPPED = [100, 100, 300, 255];
 export const MAP_BBOX = [130, 130, 130];
 export const INVISIBLE = [0, 0, 0, 0];

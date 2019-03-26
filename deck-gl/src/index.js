@@ -1,12 +1,13 @@
 import {Deck} from './deck';
 import {Map} from './map';
-import {loadBoundingBox, loadGraph} from './remote';
+import {loadBoundingBox, loadEdgeCoordinate, loadGraph, loadLocationLookup, loadNodeCoordinate} from './remote';
 import {GraphLayer} from './graphLayer';
 import {BoundingBoxLayer} from './boundingBoxLayer';
 import {Menu} from './menu';
 import {hideTooltip, showTooltip} from './tooltip';
 import {SelectBoxAction} from './selectBoxAction';
 import {EventHandler} from './eventHandler';
+import {ClickMapAction} from "./clickMapAction";
 
 const deckCanvas = 'deck-canvas';
 const mapContainer = 'map-container';
@@ -16,6 +17,7 @@ const menu = new Menu();
 const map = new Map(mapDiv);
 const deck = new Deck(deckCanvas, map);
 const selectBoxAction = new SelectBoxAction(deck);
+const lookupLocationAction = new ClickMapAction(deck);
 const boundingBoxLayer = new BoundingBoxLayer(deck);
 const graphLayer = new GraphLayer(deck);
 const eventHandler = new EventHandler(mapContainer);
@@ -47,6 +49,26 @@ menu.setSelectAreaButtonAction(() => {
             selectBoxAction.stop();
             deck.redraw();
         });
+});
+
+menu.setLookupLocationAction(() => {
+    lookupLocationAction.start(mapContainer,
+        coords => {
+            queryAndDrawLocation(coords);
+            lookupLocationAction.stop();
+        },
+        () => {
+            lookupLocationAction.stop();
+            deck.redraw();
+        })
+});
+
+menu.setZoomToNodeAction(nodeId => {
+    queryAndFocusNodePosition(nodeId);
+});
+
+menu.setZoomToEdgeAction(edgeId => {
+    queryAndFocusEdgePosition(edgeId);
 });
 
 graphLayer.setOnEdgeHoverAction(object => {
@@ -84,7 +106,7 @@ loadBoundingBox()
             // todo: calculate zoom to fit bbox
             const zoom = 7;
             deck.moveTo((bbox.northEast.lng + bbox.southWest.lng) / 2, (bbox.northEast.lat + bbox.southWest.lat) / 2, zoom);
-        }, 1000);
+        }, 200);
     })
     .fail(err => console.error(err));
 
@@ -101,6 +123,41 @@ function queryAndDrawGraph(box) {
         })
         .fail(err => {
             console.error('error when loading graph:', err);
+        });
+}
+
+function queryAndDrawLocation(coords) {
+    loadLocationLookup(coords)
+        .done(json => {
+            if (!json.valid) {
+                alert('no valid location lookup was possible at ' + coords)
+                return;
+            }
+            graphLayer.setLocationLookup(json);
+            deck.redraw();
+        })
+        .fail(err => {
+            console.error('error when loading location lookup:', err);
+        })
+}
+
+function queryAndFocusNodePosition(nodeId) {
+    loadNodeCoordinate(nodeId)
+        .done(coords => {
+            deck.moveTo(coords[0], coords[1], 17);
+        })
+        .fail(err => {
+            console.error('error when loading node position:', err);
+        });
+}
+
+function queryAndFocusEdgePosition(edgeId) {
+    loadEdgeCoordinate(edgeId)
+        .done(coords => {
+            deck.moveTo(coords[0], coords[1], 17);
+        })
+        .fail(err => {
+            console.error('error when loading node position:', err);
         });
 }
 
