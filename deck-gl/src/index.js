@@ -1,12 +1,13 @@
 import {Deck} from './deck';
 import {Map} from './map';
-import {loadBoundingBox, loadGraph} from './remote';
+import {loadBoundingBox, loadEdgeCoordinate, loadGraph, loadLocationLookup, loadNodeCoordinate} from './remote';
 import {GraphLayer} from './graphLayer';
 import {BoundingBoxLayer} from './boundingBoxLayer';
 import {Menu} from './menu';
 import {hideTooltip, showTooltip} from './tooltip';
 import {SelectBoxAction} from './selectBoxAction';
 import {EventHandler} from './eventHandler';
+import {ClickMapAction} from "./clickMapAction";
 
 const deckCanvas = 'deck-canvas';
 const mapContainer = 'map-container';
@@ -16,6 +17,7 @@ const menu = new Menu();
 const map = new Map(mapDiv);
 const deck = new Deck(deckCanvas, map);
 const selectBoxAction = new SelectBoxAction(deck);
+const lookupLocationAction = new ClickMapAction(deck);
 const boundingBoxLayer = new BoundingBoxLayer(deck);
 const graphLayer = new GraphLayer(deck);
 const eventHandler = new EventHandler(mapContainer);
@@ -25,8 +27,14 @@ eventHandler.setMouseMoveAction(e => {
     menu.setMousePosition(pos);
 });
 
-menu.setNodeLevelSliderChangedAction(value => {
-    graphLayer.setMaximumNodeLevel(value);
+menu.setFindNodeByIdEnteredAction(nodeId => {
+    graphLayer.setHighlightedNode(nodeId);
+    deck.redraw();
+});
+
+menu.setNodeLevelSliderChangedAction((min, max) => {
+    graphLayer.setMinimumNodeLevel(min);
+    graphLayer.setMaximumNodeLevel(max);
     deck.redraw();
 });
 
@@ -43,10 +51,39 @@ menu.setSelectAreaButtonAction(() => {
         });
 });
 
+menu.setLookupLocationAction(() => {
+    lookupLocationAction.start(mapContainer,
+        coords => {
+            queryAndDrawLocation(coords);
+            lookupLocationAction.stop();
+        },
+        () => {
+            lookupLocationAction.stop();
+            deck.redraw();
+        })
+});
+
+menu.setZoomToNodeAction(nodeId => {
+    queryAndFocusNodePosition(nodeId);
+});
+
+menu.setZoomToEdgeAction(edgeId => {
+    queryAndFocusEdgePosition(edgeId);
+});
+
 graphLayer.setOnEdgeHoverAction(object => {
     if (object) {
         const edge = object.edge;
         showTooltip(object.x, object.y, `edge: ${edge.id} (${edge.from.nodeId} - ${edge.to.nodeId}), weight=${edge.weight.toFixed(5)}`);
+    } else {
+        hideTooltip();
+    }
+});
+
+graphLayer.setOnShortcutHoverAction(object => {
+    if (object) {
+        const edge = object.edge;
+        showTooltip(object.x, object.y, `shortcut: ${edge.id} (${edge.from.nodeId} - ${edge.to.nodeId}), weight=${edge.weight.toFixed(5)}`);
     } else {
         hideTooltip();
     }
@@ -69,7 +106,7 @@ loadBoundingBox()
             // todo: calculate zoom to fit bbox
             const zoom = 7;
             deck.moveTo((bbox.northEast.lng + bbox.southWest.lng) / 2, (bbox.northEast.lat + bbox.southWest.lat) / 2, zoom);
-        }, 1000);
+        }, 200);
     })
     .fail(err => console.error(err));
 
@@ -79,11 +116,48 @@ function queryAndDrawGraph(box) {
         .done(json => {
             const bounds = getMinMaxNodeLevels(json.edges);
             menu.setNodeLevelSliderBounds(bounds.minLevel, bounds.maxLevel);
+            graphLayer.setMinimumNodeLevel(bounds.minLevel);
+            graphLayer.setMaximumNodeLevel(bounds.maxLevel);
             graphLayer.setGraph(json);
             deck.redraw();
         })
         .fail(err => {
             console.error('error when loading graph:', err);
+        });
+}
+
+function queryAndDrawLocation(coords) {
+    loadLocationLookup(coords)
+        .done(json => {
+            if (!json.valid) {
+                alert('no valid location lookup was possible at ' + coords)
+                return;
+            }
+            graphLayer.setLocationLookup(json);
+            deck.redraw();
+        })
+        .fail(err => {
+            console.error('error when loading location lookup:', err);
+        })
+}
+
+function queryAndFocusNodePosition(nodeId) {
+    loadNodeCoordinate(nodeId)
+        .done(coords => {
+            deck.moveTo(coords[0], coords[1], 17);
+        })
+        .fail(err => {
+            console.error('error when loading node position:', err);
+        });
+}
+
+function queryAndFocusEdgePosition(edgeId) {
+    loadEdgeCoordinate(edgeId)
+        .done(coords => {
+            deck.moveTo(coords[0], coords[1], 17);
+        })
+        .fail(err => {
+            console.error('error when loading node position:', err);
         });
 }
 
