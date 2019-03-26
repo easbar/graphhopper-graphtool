@@ -25,8 +25,14 @@ eventHandler.setMouseMoveAction(e => {
     menu.setMousePosition(pos);
 });
 
-menu.setNodeLevelSliderChangedAction(value => {
-    graphLayer.setMaximumNodeLevel(value);
+menu.setFindNodeByIdEnteredAction(nodeId => {
+    graphLayer.setHighlightedNode(nodeId);
+    deck.redraw();
+});
+
+menu.setNodeLevelSliderChangedAction((min, max) => {
+    graphLayer.setMinimumNodeLevel(min);
+    graphLayer.setMaximumNodeLevel(max);
     deck.redraw();
 });
 

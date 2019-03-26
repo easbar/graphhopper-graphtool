@@ -10,9 +10,15 @@
 <div id="sidenav" class="sidenav">
     <button id="select-area-button" class="button">Select Area</button>
     <p>Current pointer position (lng, lat):<br><span id="mouse-position"></span></p>
-    <p>Maximum CH node level:<span id="node-level-value">0</span></p>
+    <p>Find node by ID:</p>
+    <input id="find-node-by-id-field" type="number"/>
+    <p>Minimum CH node level:<span id="min-node-level-value">0</span></p>
     <div class="slide-container">
-        <input id="node-level-slider" type="range" min="1" max="1000000" value="50" class="slider">
+        <input id="min-node-level-slider" type="range" min="1" max="10000000" value="0" class="slider">
+    </div>
+    <p>Maximum CH node level:<span id="max-node-level-value">0</span></p>
+    <div class="slide-container">
+        <input id="max-node-level-slider" type="range" min="1" max="1000000" value="0" class="slider">
     </div>
 </div>
 <div id="map-container">

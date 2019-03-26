@@ -1,14 +1,21 @@
 const selectAreaButton = $('#select-area-button');
-const nodeLevelSlider = $('#node-level-slider');
-const nodeLevelDisplay = $('#node-level-value');
+const findNodeByIdField = $('#find-node-by-id-field');
+const minNodeLevelSlider = $('#min-node-level-slider');
+const maxNodeLevelSlider = $('#max-node-level-slider');
+const minNodeLevelDisplay = $('#min-node-level-value');
+const maxNodeLevelDisplay = $('#max-node-level-value');
 const mousePositionDisplay = $('#mouse-position');
 
 export class Menu {
 
     constructor() {
-        this._nodeLevelSliderChangedAction = (value) => {
+        this._nodeLevelSliderChangedAction = (min, max) => {
         };
-        nodeLevelSlider.on('input', this._onNodeLevelSliderChanged.bind(this));
+        this._findNodeByIdEnteredAction = (nodeId) => {
+        };
+        findNodeByIdField.keypress(this._onFindNodeById.bind(this));
+        minNodeLevelSlider.on('input', this._onNodeLevelSliderChanged.bind(this));
+        maxNodeLevelSlider.on('input', this._onNodeLevelSliderChanged.bind(this));
     }
 
     setMousePosition(pos) {
@@ -23,14 +30,29 @@ export class Menu {
         this._nodeLevelSliderChangedAction = action;
     }
 
+    setFindNodeByIdEnteredAction(action) {
+        this._findNodeByIdEnteredAction = action;
+    }
+
     setNodeLevelSliderBounds(min, max) {
-        nodeLevelSlider.attr('min', min);
-        nodeLevelSlider.attr('max', max);
+        minNodeLevelSlider.attr('min', min);
+        minNodeLevelSlider.attr('max', max);
+        maxNodeLevelSlider.attr('min', min);
+        maxNodeLevelSlider.attr('max', max);
+    }
+
+    _onFindNodeById(event) {
+        if (event.keyCode === 13) {
+            const nodeId = findNodeByIdField.val();
+            this._findNodeByIdEnteredAction(nodeId);
+        }
     }
 
     _onNodeLevelSliderChanged() {
-        const sliderValue = nodeLevelSlider.val();
-        nodeLevelDisplay.html(sliderValue);
-        this._nodeLevelSliderChangedAction(sliderValue);
+        const minSliderValue = minNodeLevelSlider.val();
+        const maxSliderValue = maxNodeLevelSlider.val();
+        minNodeLevelDisplay.html(minSliderValue);
+        maxNodeLevelDisplay.html(maxSliderValue);
+        this._nodeLevelSliderChangedAction(minSliderValue, maxSliderValue);
     }
 }

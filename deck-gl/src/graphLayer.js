@@ -5,7 +5,12 @@ export class GraphLayer {
 
     constructor(deck) {
         this._deck = deck;
+        this._minNodeLevel = 99999999;
         this._maxNodeLevel = 0;
+        this._highlightedNodes = [];
+        this._graph = {};
+        this._nodes = {};
+        this._nodesByIndex = {};
         this._onEdgeHover = e => {
         };
         this._onShortcutHover = e => {
@@ -14,8 +19,16 @@ export class GraphLayer {
         };
     }
 
+    setMinimumNodeLevel(nodeLevel) {
+        this._minNodeLevel = nodeLevel;
+    }
+
     setMaximumNodeLevel(nodeLevel) {
         this._maxNodeLevel = nodeLevel;
+    }
+
+    setHighlightedNode(nodeId) {
+        this._highlightedNodes = [nodeId];
     }
 
     setOnEdgeHoverAction(action) {
@@ -31,9 +44,41 @@ export class GraphLayer {
     }
 
     setGraph(graph) {
+        this._graph = graph;
+        this._nodesByIndex = {};
+        for (let e of graph.edges) {
+            this._nodesByIndex[e.from.nodeId] = e.from;
+            this._nodesByIndex[e.to.nodeId] = e.to;
+        }
+        this._nodes = Object.values(this._nodesByIndex);
+        this.setSearchedNodes(graph);
         this.setEdges(graph);
         this.setShortcuts(graph);
         this.setNodes(graph);
+    }
+
+    setSearchedNodes(graph) {
+        this._deck.registerLayerFactory({
+            layerId: 'graph-layer-searched-node',
+            createLayer: viewState => {
+                return new ScatterplotLayer({
+                    data: this._highlightedNodes,
+                    radiusMinPixels: 5,
+                    radiusMaxPixels: 5,
+                    getRadius: 5,
+                    visible: n => this._nodesByIndex[n] !== 'undefined',
+                    getPosition: n => this._nodesByIndex[n] !== 'undefined' ? [this._nodesByIndex[n].lon, this._nodesByIndex[n].lat] : [0, 0],
+                    getFillColor: n => this._nodesByIndex[n] !== 'undefined' ? Colors.NODE : Colors.INVISIBLE,
+                    updateTriggers: {
+                        getRadius: [this._highlightedNodes],
+                        getFillColor: [this._highlightedNodes]
+                    },
+                    autoHighlight: true,
+                    highlightColor: Colors.NODE_HIGHLIGHT,
+                    pickable: true
+                });
+            }
+        });
     }
 
     setEdges(graph) {
@@ -45,7 +90,12 @@ export class GraphLayer {
                     getStrokeWidth: 5,
                     getSourcePosition: e => [e.from.lon, e.from.lat],
                     getTargetPosition: e => [e.to.lon, e.to.lat],
-                    getColor: Colors.EDGE,
+                    getLineColor: e => {
+                        return (this.levelInRange(this._nodesByIndex[e.from.nodeId].level) || this.levelInRange(this._nodesByIndex[e.to.nodeId].level)) ? Colors.EDGE : Colors.INVISIBLE
+                    },
+                    updateTriggers: {
+                        getLineColor: [this._maxNodeLevel, this._minNodeLevel]
+                    },
                     onHover: e => {
                         if (e.object) {
                             this._onEdgeHover({
@@ -70,7 +120,7 @@ export class GraphLayer {
                 return new TextLayer({
                     data: graph.edges,
                     visible: viewState.zoom > 13,
-                    getText: e => e.id + '',
+                    // getText: e => e.id + '',
                     getSize: 20,
                     getColor: Colors.EDGE_LABEL,
                     getPosition: e => [(e.from.lon + e.to.lon) / 2, (e.from.lat + e.to.lat) / 2],
@@ -91,10 +141,12 @@ export class GraphLayer {
             createLayer: viewState => {
                 return new LineLayer({
                     data: graph.shortcuts,
-                    getStrokeWidth: 5,
+                    getStrokeWidth: 2,
                     getSourcePosition: e => [e.from.lon, e.from.lat],
                     getTargetPosition: e => [e.to.lon, e.to.lat],
-                    getColor: Colors.EDGE_HIGHLIGHT,
+                    getColor: e => {
+                        return (this.levelInRange(this._nodesByIndex[e.from.nodeId].level) || this.levelInRange(this._nodesByIndex[e.to.nodeId].level)) ? Colors.SHORTCUT : Colors.INVISIBLE
+                    },
                     onHover: e => {
                         if (e.object) {
                             this._onShortcutHover({
@@ -105,6 +157,9 @@ export class GraphLayer {
                         } else {
                             this._onShortcutHover();
                         }
+                    },
+                    updateTriggers: {
+                        getColor: [this._maxNodeLevel, this._minNodeLevel]
                     },
                     autoHighlight: true,
                     highlightColor: Colors.EDGE_HIGHLIGHT,
@@ -135,26 +190,19 @@ export class GraphLayer {
     }
 
     setNodes(graph) {
-        let nodes = {};
-        for (let e of graph.edges) {
-            nodes[e.from.nodeId] = e.from;
-            nodes[e.to.nodeId] = e.to;
-        }
-        nodes = Object.values(nodes);
-
         this._deck.registerLayerFactory({
             layerId: 'graph-layer-nodes',
             createLayer: viewState => {
                 return new ScatterplotLayer({
-                    data: nodes,
-                    radiusMinPixels: 3,
-                    radiusMaxPixels: 5,
-                    getRadius: 5,
+                    data: this._nodes,
+                    radiusMinPixels: 2,
+                    radiusMaxPixels: 3,
+                    getRadius: 3,
                     getPosition: n => [n.lon, n.lat],
-                    getColor: n => (n.level < this._maxNodeLevel) ? Colors.NODE : Colors.INVISIBLE,
+                    getFillColor: n => this.levelInRange(n.level) ? Colors.NODE : Colors.INVISIBLE,
                     updateTriggers: {
-                        getRadius: [this._maxNodeLevel],
-                        getColor: [this._maxNodeLevel]
+                        getRadius: [this._maxNodeLevel, this._minNodeLevel],
+                        getFillColor: [this._maxNodeLevel, this._minNodeLevel]
                     },
                     onHover: n => {
                         if (n.object) {
@@ -178,7 +226,7 @@ export class GraphLayer {
             layerId: 'graph-layer-node-labels',
             createLayer: viewState => {
                 return new TextLayer({
-                    data: nodes,
+                    data: this._nodes,
                     visible: viewState.zoom > 13,
                     getText: n => n.nodeId + '',
                     getSize: 20,
@@ -188,6 +236,10 @@ export class GraphLayer {
                 })
             }
         })
+    }
+
+    levelInRange(level) {
+        return level >= this._minNodeLevel && level <= this._maxNodeLevel;
     }
 }
 
