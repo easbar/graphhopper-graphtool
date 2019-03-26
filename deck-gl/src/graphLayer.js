@@ -44,7 +44,6 @@ export class GraphLayer {
     }
 
     setLocationLookup(lookup) {
-        console.log(lookup);
         this._deck.registerLayerFactory({
             layerId: 'location-lookup-points',
             createLayer: viewState => {
@@ -131,7 +130,7 @@ export class GraphLayer {
                     getSourcePosition: e => [e.from.lon, e.from.lat],
                     getTargetPosition: e => [e.to.lon, e.to.lat],
                     getColor: e => {
-                        return (this.levelInRange(this._nodesByIndex[e.from.nodeId].level) || this.levelInRange(this._nodesByIndex[e.to.nodeId].level)) ? Colors.EDGE : Colors.INVISIBLE
+                        return (this.nodeVisible(this._nodesByIndex[e.from.nodeId]) && this.nodeVisible(this._nodesByIndex[e.to.nodeId])) ? Colors.EDGE : Colors.INVISIBLE
                     },
                     updateTriggers: {
                         getColor: [this._maxNodeLevel, this._minNodeLevel]
@@ -160,9 +159,9 @@ export class GraphLayer {
                 return new TextLayer({
                     data: graph.edges,
                     visible: viewState.zoom > 13,
-                    // getText: e => e.id + '',
+                    getText: e => e.id + '',
                     getSize: 20,
-                    getColor: n => this.levelInRange(n.level) ? Colors.EDGE_LABEL : Colors.INVISIBLE,
+                    getColor: e => (this.nodeVisible(e.from) && this.nodeVisible(e.to)) ? Colors.EDGE_LABEL : Colors.INVISIBLE,
                     updateTriggers: {
                         getColor: [this._maxNodeLevel, this._minNodeLevel]
                     },
@@ -189,7 +188,7 @@ export class GraphLayer {
                     getSourcePosition: e => [e.from.lon, e.from.lat],
                     getTargetPosition: e => [e.to.lon, e.to.lat],
                     getColor: e => {
-                        return (this.levelInRange(this._nodesByIndex[e.from.nodeId].level) || this.levelInRange(this._nodesByIndex[e.to.nodeId].level)) ? Colors.SHORTCUT : Colors.INVISIBLE
+                        return (this.nodeVisible(this._nodesByIndex[e.from.nodeId]) && this.nodeVisible(this._nodesByIndex[e.to.nodeId])) ? Colors.SHORTCUT : Colors.INVISIBLE
                     },
                     onHover: e => {
                         if (e.object) {
@@ -220,7 +219,7 @@ export class GraphLayer {
                     visible: viewState.zoom > 13,
                     getText: e => e.id + '',
                     getSize: 20,
-                    getColor: n => this.levelInRange(n.level) ? Colors.EDGE_LABEL : Colors.INVISIBLE,
+                    getColor: e => (this.nodeVisible(e.from) && this.nodeVisible(e.to)) ? Colors.EDGE_LABEL : Colors.INVISIBLE,
                     updateTriggers: {
                         getColor: [this._maxNodeLevel, this._minNodeLevel]
                     },
@@ -247,7 +246,7 @@ export class GraphLayer {
                     radiusMaxPixels: 3,
                     getRadius: 3,
                     getPosition: n => [n.lon, n.lat],
-                    getFillColor: n => this.levelInRange(n.level) ? Colors.NODE : Colors.INVISIBLE,
+                    getFillColor: n => this.nodeVisible(n) ? Colors.NODE : Colors.INVISIBLE,
                     updateTriggers: {
                         getRadius: [this._maxNodeLevel, this._minNodeLevel],
                         getFillColor: [this._maxNodeLevel, this._minNodeLevel]
@@ -276,9 +275,9 @@ export class GraphLayer {
                 return new TextLayer({
                     data: this._nodes,
                     visible: viewState.zoom > 13,
-                    getText: n => n.nodeId + '',
-                    getSize: 20,
-                    getColor: n => this.levelInRange(n.level) ? Colors.NODE_LABEL : Colors.INVISIBLE,
+                    getText: n => n.nodeId + '(' + n.level + ')',
+                    getSize: 30,
+                    getColor: n => this.nodeVisible(n) ? Colors.NODE_LABEL : Colors.INVISIBLE,
                     updateTriggers: {
                         getColor: [this._maxNodeLevel, this._minNodeLevel]
                     },
@@ -289,7 +288,13 @@ export class GraphLayer {
         })
     }
 
-    levelInRange(level) {
+    nodeVisible(node) {
+        const level = node.level;
+        // hard-coded for now.
+        const filteredNodes = [];
+        if (filteredNodes.length > 0 && filteredNodes.indexOf(node.nodeId) < 0) {
+            return false;
+        }
         return level >= this._minNodeLevel && level <= this._maxNodeLevel;
     }
 }
