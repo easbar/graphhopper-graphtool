@@ -173,7 +173,8 @@ function getMinMaxNodeLevels(edges) {
 
 function logBBoxForOsmosis(box) {
     console.log(`osmosis --read-pbf file=-` +
-        ` --bounding-box left=${box.southWest.lng} bottom=${box.southWest.lat} right=${box.northEast.lng} top=${box.northEast.lat}` +
+        ` --bounding-box left=${box.southWest.lng} right=${box.northEast.lng} bottom=${box.southWest.lat} top=${box.northEast.lat}` +
         ` --write-pbf file=-`);
+    console.log(`new BBox(${box.southWest.lng}, ${box.northEast.lng}, ${box.southWest.lat}, ${box.northEast.lat});`);
 }
 
