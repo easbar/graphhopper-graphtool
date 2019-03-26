@@ -52,6 +52,15 @@ graphLayer.setOnEdgeHoverAction(object => {
     }
 });
 
+graphLayer.setOnShortcutHoverAction(object => {
+    if (object) {
+        const edge = object.edge;
+        showTooltip(object.x, object.y, `shortcut: ${edge.id} (${edge.from.nodeId} - ${edge.to.nodeId}), weight=${edge.weight.toFixed(5)}`);
+    } else {
+        hideTooltip();
+    }
+});
+
 graphLayer.setOnNodeHoverAction(object => {
     if (object) {
         const node = object.node;

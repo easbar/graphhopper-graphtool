@@ -8,6 +8,8 @@ export class GraphLayer {
         this._maxNodeLevel = 0;
         this._onEdgeHover = e => {
         };
+        this._onShortcutHover = e => {
+        };
         this._onNodeHover = n => {
         };
     }
@@ -20,11 +22,21 @@ export class GraphLayer {
         this._onEdgeHover = action;
     }
 
+    setOnShortcutHoverAction(action) {
+        this._onShortcutHover = action;
+    }
+
     setOnNodeHoverAction(action) {
         this._onNodeHover = action;
     }
 
     setGraph(graph) {
+        this.setEdges(graph);
+        this.setShortcuts(graph);
+        this.setNodes(graph);
+    }
+
+    setEdges(graph) {
         this._deck.registerLayerFactory({
             layerId: 'graph-layer-edges',
             createLayer: viewState => {
@@ -71,7 +83,58 @@ export class GraphLayer {
                 })
             }
         });
+    }
 
+    setShortcuts(graph) {
+        this._deck.registerLayerFactory({
+            layerId: 'graph-layer-shortcuts',
+            createLayer: viewState => {
+                return new LineLayer({
+                    data: graph.shortcuts,
+                    getStrokeWidth: 5,
+                    getSourcePosition: e => [e.from.lon, e.from.lat],
+                    getTargetPosition: e => [e.to.lon, e.to.lat],
+                    getColor: Colors.EDGE_HIGHLIGHT,
+                    onHover: e => {
+                        if (e.object) {
+                            this._onShortcutHover({
+                                x: e.x,
+                                y: e.y,
+                                edge: e.object
+                            });
+                        } else {
+                            this._onShortcutHover();
+                        }
+                    },
+                    autoHighlight: true,
+                    highlightColor: Colors.EDGE_HIGHLIGHT,
+                    pickable: true
+                });
+            }
+        });
+
+        this._deck.registerLayerFactory({
+            layerId: 'graph-layer-shortcut-labels',
+            createLayer: viewState => {
+                return new TextLayer({
+                    data: graph.shortcuts,
+                    visible: viewState.zoom > 13,
+                    getText: e => e.id + '',
+                    getSize: 20,
+                    getColor: Colors.EDGE_LABEL,
+                    getPosition: e => [(e.from.lon + e.to.lon) / 2, (e.from.lat + e.to.lat) / 2],
+                    getAngle: e => getAngleBetweenPoints(e.from.lon, e.from.lat, e.to.lon, e.to.lat),
+                    getPixelOffset: e => {
+                        const angle = getAngleBetweenPoints(e.from.lon, e.from.lat, e.to.lon, e.to.lat);
+                        const offset = 22;
+                        return [offset * Math.sin(toRadians(angle)), offset * Math.cos(toRadians(angle))];
+                    }
+                })
+            }
+        });
+    }
+
+    setNodes(graph) {
         let nodes = {};
         for (let e of graph.edges) {
             nodes[e.from.nodeId] = e.from;
